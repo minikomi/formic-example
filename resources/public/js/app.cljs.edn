@@ -1,0 +1,3 @@
+{:require  [formic-example.frontend.app]
+ :init-fns [formic-example.frontend.app/init]
+ :compiler-options {:asset-path "js/app.out"}}
