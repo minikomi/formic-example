@@ -15,8 +15,8 @@
                  [weasel                    "0.7.0"      :scope "test"]
                  [funcool/struct "1.2.0"]
                  [co.poyo/formic "0.1.0-SNAPSHOT"]
-                 [garden "1.3.4"]
-                 [reagent "0.7.0"]])
+                 [garden "1.3.5"]
+                 [reagent "0.8.0"]])
 
 (require
  '[tasks.garden]
