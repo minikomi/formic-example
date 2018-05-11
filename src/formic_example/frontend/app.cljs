@@ -2,7 +2,10 @@
   (:require [reagent.core :as reagent :refer [atom]]
             [struct.core :as st]
             [formic.validation :as fv]
-            [formic.components.quill :as quill]
+            [formic.components.date-picker :as dp]
+            [cljs-time.core :as t]
+            [cljs-time.coerce :refer [to-long]]
+;            [formic.components.quill :as quill]
             [cljs.pprint :refer [pprint]]
             [formic.field :as formic-field]
             [reagent.core :as r]
@@ -12,24 +15,33 @@
 
 (def validate-url
   {:message "有効なURLを入力してください"
-   :optional true
    :validate (fn [txt]
                (or
                 (empty? txt)
                 (re-matches url-regex txt)))})
+
+(def validate-date
+  {:message "今日以外の日を選んで下さい"
+   :optional true
+   :validate (fn [d]
+               (js/console.log d )
+               (not
+                (t/equal? d (t/today))))})
 
 (def page-details-field
   {:fields
    [{:id :title-text
      :type :string
      :validation [st/required]}
-    {:id      :page-type
-     :type    :radios
-     :default "photo"
+    {:id :page-type
+     :type :radios
      :options {"photo" "Photo"}}
+    {:id :date-created
+     :default (t/today)
+     :type :date
+     :validation [st/required validate-date]}
     {:id :title-type
      :type :radios
-     :default "wide"
      :options {"wide" "Wide"
                "normal" "Normal"}
      :validation [st/required]}
@@ -116,11 +128,20 @@
    ;; form fields
    :fields form-fields
    ;; serializers
-   :serializers {:quill quill/serializer}
+   :serializers {
+                 :date dp/DEFAULT_SERIALIZER
+                 }
+   :parsers {
+             :date dp/DEFAULT_PARSER
+             }
+   :components {
+                :date dp/date-picker
+                }
    :values {:page-data
             {:page-type "photo"
              :title-text "title text value"
              :title-type "normal"
+             :date-created "2014-06-12"
              :subtitle-text "subtitle value"
              :issue-text "issue text"}
             :credits
@@ -140,10 +161,13 @@
 
 (defn form-component []
   (let [form-state (formic-field/prepare-all-fields form-schema)]
-    [:div "Parent component"
-     [:pre (with-out-str (pprint form-state))]
-     [:form
-      [ff/formic-fields form-schema form-state]]]))
+    (fn []
+      [:div "Parent component"
+       [:pre (with-out-str (pprint (formic-field/validate-all form-state)))]
+       [:form
+        [ff/formic-fields form-schema form-state]
+        [:pre (with-out-str (pprint (formic-field/serialize form-state)))]
+        [:pre (with-out-str (pprint form-schema))]]])))
 
 (defn init []
   (reagent/render-component
