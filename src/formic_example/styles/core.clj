@@ -84,6 +84,70 @@
       :margin-bottom  (px 5)
       :font-size      (px 12)}]]])
 
+(def datepicker
+  [:.date-picker
+   {:position 'relative
+    :width (percent 100)}
+   [:.date-picker-table-wrapper
+    {:border [['solid (px 1) "#e2e2e2"]]
+     :position 'absolute
+     :z-index 100
+     :background 'white
+     :width (percent 40)
+     :left (percent 10)
+     :top (px 30)
+     :box-shadow [[0 (px 3) (px 13) "rgba(0,0,0,0.1)"]]
+     :padding (px 10)}]
+   [:td
+    {:user-select 'none}]
+   [:td.next.active
+    :td.prev.active
+    {:cursor 'pointer
+     :height (px 30)}
+    [:&:hover
+     {:background "#aaa"
+      :color 'white}]]
+   [:table.date-picker-table
+    {:width (percent 100)
+     :border-collapse 'collapse}
+    [:select
+     {:margin (px 4)}]
+    [:tr.days
+     [:td
+      {:height (px 30)
+       :background "#e2e2e2"}]]
+    [:tr
+     [:td
+      {:text-align 'center
+       :padding 0
+       :width (percent (/ 100 7))
+       :font-size (px 12)
+       :line-height 0
+       :border [[(px 1) 'solid "#ebebeb"]]}
+      [:.wrapper
+       {:display 'block
+        :line-height (px 40)
+        :vertical-align 'middle
+        :width (percent 100)
+        :height (percent 100)}]
+      [:&.not-valid
+       {:color "#e2e2e2"}]
+      [:&.valid
+       {:cursor 'pointer}
+       [:&:hover
+        [:.wrapper
+         {:background "#f2f2f2"}]]]
+      [:&.today
+       {:font-weight 'bold
+        :text-decoration 'underline}]
+      [:.wrapper
+       {:width (percent 100)
+        :display 'inline-block}]
+      [:&.selected.valid
+       [:.wrapper
+        {:background "#2f59a3"
+         :color 'white}]]]]]])
+
 (def form
   [:form
    {:width   (percent 90)
@@ -110,6 +174,7 @@
    field-flex
    field-photo-credit
    compound-field
+   datepicker
    [:textarea
     {:min-height (px 200)
      :min-width  (px 500)}]

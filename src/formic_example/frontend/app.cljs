@@ -39,6 +39,7 @@
     {:id :date-created
      :default (t/today)
      :type :date
+     :disabled? #(t/equal? (t/today) %)
      :validation [st/required validate-date]}
     {:id :title-type
      :type :radios
