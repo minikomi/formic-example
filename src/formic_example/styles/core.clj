@@ -175,6 +175,13 @@
    field-photo-credit
    compound-field
    datepicker
+   [:.formic-google-map
+    {:display 'inline-block
+     :width (percent 90)}
+    [:.map-wrapper
+     [:.map-holder
+      {:height (px 300)
+       :width (percent 100)}]]]
    [:textarea
     {:min-height (px 200)
      :min-width  (px 500)}]
