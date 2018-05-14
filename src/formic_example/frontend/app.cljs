@@ -21,9 +21,15 @@
                           err
                           ] :as f}]
   (let [state (r/atom :init)
-        map (r/atom nil)]
+        map (r/atom nil)
+        map-holder-el (r/atom nil)
+        autocomplete-input-el (r/atom nil)
+        autocomplete (r/atom nil)
+        address-val (r/atom "")
+        marker (r/atom nil)
+        geocoder (google.maps.Geocoder.)
+        ]
    (r/create-class
-
     {:component-will-mount
      (fn [_ _]
        (when (and js/navigator.geolocation
@@ -37,26 +43,90 @@
                    :lng (.. pos -coords -longitude)))))
        (r/track! (fn []
                    (when (and @map
+                              @marker
                               (:lat @current-value)
                               (:lng @current-value))
-                     (.setCenter @map
-                                 (clj->js
-                                  {:lat (:lat @current-value)
-                                   :lng (:lng @current-value)}))))))
+                     (let [latlng (js/google.maps.LatLng.
+                                   (:lat @current-value)
+                                   (:lng @current-value))]
+                       (.panTo @map latlng)
+                       (.setPosition @marker latlng)
+                     )))))
      :component-did-mount
      (fn [this _]
        (reset! map
-        (js/google.maps.Map.
-         (gdom/getElementByClass "map-holder" (r/dom-node this))
+               (js/google.maps.Map.
+                @map-holder-el
+                (clj->js {:center (js/google.maps.LatLng. 35.6895 139.6917)
+                          :zoom 12})))
+       (reset! marker
+        (js/google.maps.Marker.
          (clj->js {:center (js/google.maps.LatLng. 35.6895 139.6917)
-                   :zoom 12}))))
+                   :map @map
+                   :draggable true
+                   :animation js/google.maps.Animation.DROP
+                   })))
+       (js/google.maps.event.addListener
+        @marker "dragend"
+        (fn [ev]
+          (swap! current-value
+                 assoc
+                 :lat (ev.latLng.lat)
+                 :lng (ev.latLng.lng))
+          (.geocode geocoder
+                    (clj->js {:location ev.latLng})
+                    (fn [results status]
+                      (when (= status "OK")
+                        (js/console.log (first results))
+                        (swap! current-value assoc
+                               :address (or (.. (first results)
+                                                -address_components
+                                                -long_name)
+                                            (.-formatted_address (first results))))
+                        )))))
+       (reset! autocomplete
+               (google.maps.places.Autocomplete. @autocomplete-input-el))
+       (.bindTo @autocomplete "bounds" @map)
+       (.addListener @autocomplete
+                     "place_changed"
+                     (fn []
+                       (when-let [place (.getPlace @autocomplete)]
+                         (when place.geometry
+                           (if place.geometry.viewport
+                             (.fitBounds @map place.geometry.viewport)
+                             (do
+                               (.setCenter @map place.geometry.location)
+                               (.setZoom @map 17)))
+                           (swap! current-value assoc
+                                  :address place.name
+                                  :lat (place.geometry.location.lat)
+                                  :lng (place.geometry.location.lng))))))
+       (reset! state :active))
      :reagent-render
      (fn [{:keys [current-value err] :as f}]
       [:div
        [:span.formic-input-title (u/format-kw (:id f))]
        [:div.formic-google-map
         [:div.map-wrapper
-         [:div.map-holder]]]])})))
+         [:label
+          "Address:"
+          [:input
+           {:value (or (:address @current-value) "")
+            :on-change #(swap! current-value assoc :address (.. % -target -value))
+            :ref (fn [el] (reset! autocomplete-input-el el))}]]
+         [:div.map-holder
+          {:ref (fn [el] (reset! map-holder-el el))}]
+         [:label
+          "Lat:"
+          [:input {:value (if-let [lng (:lng @current-value)]
+                            lng
+                            "")}]]
+         [:label
+          "Long:"
+          [:input {:value (if-let [lat (:lng @current-value)]
+                            lat
+                            "")}]]
+         ]]])})))
 
 
 (def url-regex #"https?://(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)")
