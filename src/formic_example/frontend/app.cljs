@@ -20,13 +20,14 @@
                 (empty? txt)
                 (re-matches url-regex txt)))})
 
+(defn date-active? [d]
+  (not
+   (t/equal? d (t/today))))
+
 (def validate-date
   {:message "今日以外の日を選んで下さい"
    :optional true
-   :validate (fn [d]
-               (js/console.log d )
-               (not
-                (t/equal? d (t/today))))})
+   :validate date-active?})
 
 (def page-details-field
   {:fields
@@ -39,7 +40,7 @@
     {:id :date-created
      :default (t/today)
      :type :date
-     :disabled? #(t/equal? (t/today) %)
+     :active? date-active?
      :validation [st/required validate-date]}
     {:id :title-type
      :type :radios
