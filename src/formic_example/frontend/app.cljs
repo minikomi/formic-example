@@ -37,6 +37,7 @@
         marker (r/atom nil)
         update-on-event (fn [ev]
                           (reset! touched true)
+                          (.stop ev)
                           (swap! current-value
                                  assoc
                                  :lat (ev.latLng.lat)
