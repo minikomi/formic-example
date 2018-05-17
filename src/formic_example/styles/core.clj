@@ -175,6 +175,22 @@
    field-photo-credit
    compound-field
    datepicker
+   [:.formic-flex-add
+    [:a.button
+     {:border [[(px 1) 'solid "#22aeff"]]
+      :color "#22aeff"
+      :border-radius (px 4)
+      :text-decoration 'none
+      :padding (px 8)}
+     [:span.plus
+      {:font-weight 'bold
+       :font-family 'courier
+       :font-size (px 15)
+       :margin-right (px 6)}]
+     [:&:hover
+      {:cursor 'pointer
+       :background-color "#22aeff"
+       :color 'white}]]]
    [:.formic-google-map
     {:display 'inline-block
      :width (percent 90)}
