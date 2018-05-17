@@ -180,12 +180,34 @@
      :width (percent 90)}
     [:.map-wrapper
      [:.map-holder
-      {:height (px 300)
-       :width (percent 100)}]]]
+      {:margin-top (px 10)}
+      {:height (px 450)
+       :width (percent 100)}]]
+    [:.formic-lat-lng
+     {:margin-top (px 10)}
+     [:span
+      {:display 'inline-block
+       :font-size (px 12)
+       :font-weight 'bold
+       :margin [[(px 10) (px 10) 0 0]]}]
+     [:input
+      {:padding (px 5)
+       :background "#fafafa"
+       :margin-right (px 10)}]]
+    [:.formic-auto-complete
+     [:span
+      {:display 'inline-block
+       :font-size (px 12)
+       :font-weight 'bold
+       :width (percent 5)}]
+     [:input
+      {:display 'inline-block
+       :margin-left (percent 2)
+       :padding [[(px 5)]]
+       :width (percent 93)}]]]
    [:textarea
     {:min-height (px 200)
      :min-width  (px 500)}]
-
    [:input
     [(gs/& (gs/attr :type := :text))
      {:border              [[(px 1) 'solid "#e2e2e2"]]
