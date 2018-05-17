@@ -135,7 +135,7 @@
                                 (when-let [v (not-empty (.. ev -target -value))]
                                   (swap! current-value assoc :lat (js/parseFloat v))
                                   (geocode-position current-value)))
-                   :value (if-let [lng (:lat @current-value)]
+                   :value (if-let [lat (:lat @current-value)]
                             (.toPrecision lng 8)
                             "")}]]
          [:label.formic-lat-lng
