@@ -177,8 +177,8 @@
    datepicker
    [:.formic-flex-add
     [:a.button
-     {:border [[(px 1) 'solid "#22aeff"]]
-      :color "#22aeff"
+     {:border [[(px 1) 'solid "#2f59a3"]]
+      :color "#2f59a3"
       :border-radius (px 4)
       :text-decoration 'none
       :padding (px 8)}
@@ -189,7 +189,7 @@
        :margin-right (px 6)}]
      [:&:hover
       {:cursor 'pointer
-       :background-color "#22aeff"
+       :background-color "#2f59a3"
        :color 'white}]]]
    [:.formic-google-map
     {:display 'inline-block
