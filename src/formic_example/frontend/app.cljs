@@ -1,17 +1,18 @@
 (ns formic-example.frontend.app
   (:require [reagent.core :as reagent :refer [atom]]
-            [struct.core :as st]
-            [formic.validation :as fv]
-            [formic.components.date-picker :as dp]
-            [cljs-time.core :as t]
             [cljs-time.coerce :refer [to-long]]
-;            [formic.components.quill :as quill]
+            [cljs-time.core :as t]
             [cljs.pprint :refer [pprint]]
+            [formic.components.date-picker :as dp]
+            [formic.components.quill :as quill]
             [formic.field :as formic-field]
+            [formic.frontend :as ff]
             [formic.util :as u]
-            [reagent.core :as r]
+            [formic.validation :as fv]
             [goog.dom :as gdom]
-            [formic.frontend :as ff]))
+            [reagent.core :as r]
+            [struct.core :as st]
+            ))
 
 (def geocoder (google.maps.Geocoder.))
 
@@ -54,7 +55,8 @@
           (fn [pos]
             (swap! current-value assoc
                    :lat (.. pos -coords -latitude)
-                   :lng (.. pos -coords -longitude)))))
+                   :lng (.. pos -coords -longitude))
+            (geocode-position current-value))))
        (r/track! (fn []
                    (when (and @map
                               @marker
@@ -258,7 +260,7 @@
           {:src src}]])
       test-images)}
     {:id :photo-text
-     :type :text
+     :type :quill
      :validation [st/required]}]})
 
 (def compound-fields
@@ -287,6 +289,7 @@
    ;; serializers
    :serializers {
                  :date dp/DEFAULT_SERIALIZER
+                 :quill quill/DEFAULT_SERIALIZER
                  }
    :parsers {
              :date dp/DEFAULT_PARSER
@@ -294,6 +297,7 @@
    :components {
                 :date dp/date-picker
                 :lat-lng google-map
+                :quill quill/quill
                 }
    :values {:page-data
             {:page-type "photo"

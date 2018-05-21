@@ -3,6 +3,7 @@
  :resource-paths  #{"resources"}
  :checkouts '[[co.poyo/formic "0.1.0-SNAPSHOT"]
               [co.poyo/formic-datepicker "0.1.0-SNAPSHOT"]
+              [co.poyo/formic-quill "0.1.0-SNAPSHOT"]
               ]
  :dependencies '[;; pin deps
                  [org.clojure/clojure "1.8.0"]
@@ -18,6 +19,7 @@
                  [funcool/struct "1.2.0"]
                  [co.poyo/formic "0.1.0-SNAPSHOT"]
                  [co.poyo/formic-datepicker "0.1.0-SNAPSHOT"]
+                 [co.poyo/formic-quill "0.1.0-SNAPSHOT"]
                  [garden "1.3.5"]
                  [reagent "0.8.0"]])
 
@@ -71,9 +73,17 @@
   (comp
    (set-options)
    (cider)
-   (serve :dir "target/public")
+   (serve :dir "target/public" :port 3042)
    (watch)
    (cljs-repl)
    (reload)
    (build-frontend)
+   (target)))
+
+(deftask build []
+  (comp
+   (set-options)
+   (build-frontend)
+   (sift :include #{#"\.out" #".*\.edn$"} :invert true)
+   (sift :include #{#"^public/"})
    (target)))

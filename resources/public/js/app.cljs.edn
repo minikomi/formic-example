@@ -1,3 +1,5 @@
 {:require  [formic-example.frontend.app]
  :init-fns [formic-example.frontend.app/init]
- :compiler-options {:asset-path "js/app.out"}}
+ :compiler-options {:asset-path "js/app.out"
+                    :externs ["src/js/google_maps_externs.js"]
+                    }}

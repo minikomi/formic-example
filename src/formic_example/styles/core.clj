@@ -224,6 +224,11 @@
    [:textarea
     {:min-height (px 200)
      :min-width  (px 500)}]
+   [:.formic-quill
+    [:.formic-quill-editor-wrapper
+     {:background 'white
+      :width (percent 90)
+      :display 'inline-block}]]
    [:input
     [(gs/& (gs/attr :type := :text))
      {:border              [[(px 1) 'solid "#e2e2e2"]]
@@ -231,7 +236,11 @@
       :display             'inline-block
       :vertical-align 'top
       "-webkit-appearance" 'none
-      :padding             [[(px 8) (px 4)]]}]]])
+      :padding             [[(px 8) (px 4)]]}]]
+   [".error > h3"
+    {:color "red"}]
+   [".error > label > input[type=text]"
+    {:background "fff3ee"}]])
 
 (def combined
   [[:*
