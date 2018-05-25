@@ -3,6 +3,7 @@
  :resource-paths  #{"resources"}
  :checkouts '[[co.poyo/formic "0.1.0-SNAPSHOT"]
               [co.poyo/formic-datepicker "0.1.0-SNAPSHOT"]
+              [co.poyo/formic-google-map "0.1.0-SNAPSHOT"]
               [co.poyo/formic-quill "0.1.0-SNAPSHOT"]
               ]
  :dependencies '[;; pin deps
@@ -11,6 +12,7 @@
                  [adzerk/boot-cljs          "2.1.4"      :scope "test"]
                  [adzerk/boot-cljs-repl     "0.3.3"      :scope "test"]
                  [adzerk/boot-reload        "0.5.2"      :scope "test"]
+                 [co.poyo/formic-google-map "0.1.0-SNAPSHOT"]
                  [pandeiro/boot-http        "0.8.3"      :scope "test"
                   :exclusions [org.clojure]]
                  [com.cemerick/piggieback   "0.2.2"      :scope "test"]
