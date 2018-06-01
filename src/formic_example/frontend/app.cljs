@@ -56,7 +56,9 @@
      :validation []}
     {:id :issue-text
      :type :string
-     :validation []}]})
+     :validation []}]
+   :validation
+   {:subtitle-text [[st/identical-to :issue-text]]}})
 
 (def name-field
   {:fields
@@ -159,40 +161,41 @@
                 :date dp/date-picker
                 :google-map gm/google-map
                 :quill quill/quill
-                }
-   :values {:page-data
-            {:page-type "photo"
-             :title-text "title text value"
-             :title-type "normal"
-             :date-created "2014-06-12"
-             :subtitle-text "subtitle value"
-             :issue-text "issue text"}
-            :credits
-            [{:_compound :credit
-              :role "hair"
-              :names
-              [{:_compound :name :name "john" :url "http://google.com"}
-               {:_compound :name :name "kaneko" :url "http://pizza.com"}]}]
-            :photo-credits
-            [{:_compound :photo-credit
-              :images #{1 2}
-              :photo-text
-              "High neck shirt / 21000yen\nBlack merci pants / 34000yen"}
-             {:_compound :photo-credit
-              :images #{0 6 8}
-              :photo-text "High neck shirt / 21000yen\n"}]}})
+                }})
 
 (defn serialized [form-state]
   [:pre (with-out-str (pprint (formic-field/serialize form-state)))])
 
 (defn form-component []
-  (let [form-state (formic-field/prepare-all-fields form-schema)]
+  (let [form-state (formic-field/prepare-state
+                    form-schema
+                    {:page-data
+                     {:page-type "photo"
+                      :title-text "title text value"
+                      :title-type "normal"
+                      :date-created "2014-06-12"
+                      :subtitle-text nil
+                      :issue-text nil}
+                     :credits
+                     [{:compound :credit
+                       :role "hair"
+                       :names
+                       [{:compound :name :name "john" :url "http://google.com"}
+                        {:compound :name :name "kaneko" :url "http://pizza.com"}]}]
+                     :photo-credits
+                     [{:compound :photo-credit
+                       :images #{1 2}
+                       :photo-text
+                       "High neck shirt / 21000yen\nBlack merci pants / 34000yen"}
+                      {:compound :photo-credit
+                       :images #{0 6 8}
+                       :photo-text "High neck shirt / 21000yen\n"}]})]
     (fn []
       [:div "Parent component"
-       [:pre (with-out-str (pprint (formic-field/validate-all form-state)))]
+       [:pre (with-out-str (pprint @form-state))]
        [:form
         [ff/formic-fields form-schema form-state]
-        [serialized form-state]
+        ;; [serialized form-state]
         ]])))
 
 (defn init []
