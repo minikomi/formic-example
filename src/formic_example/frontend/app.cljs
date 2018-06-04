@@ -58,7 +58,7 @@
      :type :string
      :validation []}]
    :validation
-   {:subtitle-text [[st/identical-to :issue-text]]}})
+   {:issue-text [[st/identical-to :subtitle-text]]}})
 
 (def name-field
   {:fields
@@ -192,11 +192,10 @@
                        :photo-text "High neck shirt / 21000yen\n"}]})]
     (fn []
       [:div "Parent component"
-       [:pre (with-out-str (pprint @form-state))]
        [:form
         [ff/formic-fields form-schema form-state]
-        ;; [serialized form-state]
-        ]])))
+        [:pre (with-out-str (pprint @form-state))]]
+       ])))
 
 (defn init []
   (reagent/render-component
