@@ -43,7 +43,7 @@
      :options {"photo" "Photo"}}
     {:id :date-created
      :default (t/today)
-     :type :date
+     :type :formic-datepicker
      :active? date-active?
      :validation [st/required validate-date]}
     {:id :title-type
@@ -123,7 +123,7 @@
           {:src src}]])
       test-images)}
     {:id :photo-text
-     :type :quill
+     :type :formic-quill
      :validation [st/required]}]})
 
 (def compound-fields
@@ -145,23 +145,8 @@
 
 (def form-schema
   {:id :test-form
-   ;; compound fields
    :compound compound-fields
-   ;; form fields
-   :fields form-fields
-   ;; serializers
-   :serializers {
-                 :date dp/DEFAULT_SERIALIZER
-                 :quill quill/DEFAULT_SERIALIZER
-                 }
-   :parsers {
-             :date dp/DEFAULT_PARSER
-             }
-   :components {
-                :date dp/date-picker
-                :google-map gm/google-map
-                :quill quill/quill
-                }})
+   :fields form-fields})
 
 (defn serialized [form-state]
   [:pre (with-out-str (pprint (formic-field/serialize form-state)))])
