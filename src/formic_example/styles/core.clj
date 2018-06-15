@@ -194,8 +194,8 @@
    [:.formic-google-map
     {:display 'inline-block
      :width (percent 90)}
-    [:.map-wrapper
-     [:.map-holder
+    [:.formic-map-wrapper
+     [:.formic-map-holder
       {:margin-top (px 10)}
       {:height (px 450)
        :width (percent 100)}]]

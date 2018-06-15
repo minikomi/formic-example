@@ -75,10 +75,9 @@
      :type :string
      :validation [st/required]}
     {:id :location
-     :type :google-map
+     :type :formic-google-map
      :autocomplete true
-     :validation []}]
-   })
+     :validation []}]})
 
 (def credit-field
   {:fields
@@ -179,7 +178,7 @@
       [:div "Parent component"
        [:form
         [ff/formic-fields form-schema form-state]
-        [:pre (with-out-str (pprint @form-state))]]
+        [serialized form-state]]
        ])))
 
 (defn init []
