@@ -13,6 +13,7 @@
             [goog.dom :as gdom]
             [reagent.core :as r]
             [struct.core :as st]
+            [cljs.pprint]
             ))
 
 (def url-regex #"https?://(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)")
@@ -148,42 +149,42 @@
    :fields form-fields})
 
 (defn serialized [form-state]
-  [:pre (with-out-str (pprint (formic-field/serialize form-state)))])
+  [:pre (with-out-str (cljs.pprint/pprint (formic-field/serialize form-state)))])
 
-(defn form-component []
-  (let [form-state (formic-field/prepare-state
-                    form-schema
-                    {:page-data
-                     {:page-type "photo"
-                      :title-text "title text value"
-                      :title-type "normal"
-                      :date-created "2014-06-12"
-                      :subtitle-text nil
-                      :issue-text nil}
-                     :credits
-                     [{:compound :credit
-                       :role "hair"
-                       :names
-                       [{:compound :name :name "john" :url "http://google.com"}
-                        {:compound :name :name "kaneko" :url "http://pizza.com"}]}]
-                     :photo-credits
-                     [{:compound :photo-credit
-                       :images #{1 2}
-                       :photo-text
-                       "High neck shirt / 21000yen\nBlack merci pants / 34000yen"}
-                      {:compound :photo-credit
-                       :images #{0 6 8}
-                       :photo-text "High neck shirt / 21000yen\n"}]})]
-    (fn []
-      [:div "Parent component"
-       [:form
-        [ff/formic-fields form-schema form-state]
-        [serialized form-state]]
-       ])))
+(defn form-component [form-state]
+  [:div "Parent component"
+   [:form
+    [ff/formic-fields form-state]
+    [serialized form-state]]
+   ])
 
 (defn init []
   (reagent/render-component
-   [form-component]
+   [form-component
+    (formic-field/prepare-state
+     form-schema
+     {:page-data
+      {:page-type "photo"
+       :title-text "title text value"
+       :title-type "normal"
+       :date-created "2014-06-12"
+       :subtitle-text nil
+       :issue-text nil}
+      :credits
+      [{:compound :credit
+          :role "hair"
+          :names
+          [{:compound :name :name "john" :url "http://google.com"}
+           {:compound :name :name "kaneko" :url "http://pizza.com"}]}]
+      :photo-credits []
+      #_ [{:compound :photo-credit
+           :images #{1 2}
+           :photo-text
+           "High neck shirt / 21000yen\nBlack merci pants / 34000yen"}
+          {:compound :photo-credit
+           :images #{0 6 8}
+           :photo-text "High neck shirt / 21000yen\n"}]})
+    ]
    (.getElementById js/document "container")))
 
 (init)
