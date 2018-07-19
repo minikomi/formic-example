@@ -23,7 +23,7 @@
                  [co.poyo/formic-datepicker "0.1.0-SNAPSHOT"]
                  [co.poyo/formic-quill "0.1.0-SNAPSHOT"]
                  [garden "1.3.5"]
-                 [reagent "0.8.0"]])
+                 [reagent "0.7.0"]])
 
 (require
  '[tasks.garden]
