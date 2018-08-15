@@ -4,45 +4,45 @@
    [garden.units :refer [em percent px]]))
 
 (def field-flex
-  [:.formic-flex
-   [:.formic-flex-field
-    {:position      'relative
-     :margin        [[(percent 2) 'auto]]
-     :background    "#f2f2f2"
-     :width         (percent 98)
-     :border        [[(px 1) 'solid "#e2e2e2"]]
-     :box-shadow [[0 0 (px 13) "rgba(0,0,0,0.1)"]]
-     :border-radius (px 6)
-     :padding       (px 8)}
-    [:h4
-     {:margin    0
-      :font-size (px 12)
-      :padding   (px 6)}]
-    [:.formic-flex-controls
-     {:margin     0
-      :padding    0
-      :position   'absolute
-      :right      (px 10)
-      :top        (px 10)
-      :text-align 'right}
-     [:li
-      {:list-style 'none
-       :display    'inline-block}
-      [:a
-       {:display         'block
-        :padding         (px 4)
-        :font-size       (px 12)
-        :line-height     (px 12)
-        :text-decoration 'none
-        :color           'black
-        :margin-left     (px 2)
-        :width           (px 22)
-        :text-align      'center
-        :border          [[(px 1) 'solid "#ccc"]]
-        :background      'white}
-       [:&.disabled
-        {:cursor  'normal
-         :opacity 0.2}]]]]]])
+  [:.formic-flex-field
+   {:position      'relative
+    :list-style    'none
+    :margin        [[(percent 2) 'auto]]
+    :background    "#f2f2f2"
+    :width         (percent 98)
+    :border        [[(px 1) 'solid "#e2e2e2"]]
+    :box-shadow [[0 0 (px 13) "rgba(0,0,0,0.1)"]]
+    :border-radius (px 6)
+    :padding       (px 8)}
+   [:h4
+    {:margin    0
+     :font-size (px 12)
+     :padding   (px 6)}]
+   [:.formic-flex-controls
+    {:margin     0
+     :padding    0
+     :position   'absolute
+     :right      (px 10)
+     :top        (px 10)
+     :text-align 'right}
+    [:li
+     {:list-style 'none
+      :display    'inline-block}
+     [:a
+      {:display         'block
+       :padding         (px 4)
+       :font-size       (px 12)
+       :line-height     (px 12)
+       :text-decoration 'none
+       :color           'black
+       :margin-left     (px 2)
+       :width           (px 22)
+       :text-align      'center
+       :border          [[(px 1) 'solid "#ccc"]]
+       :background      'white}
+      [:&.disabled
+       {:cursor  'normal
+        :opacity 0.2}]]]]])
 
 (def field-photo-credit
   [:.formic-compound.photo-credit
@@ -149,10 +149,10 @@
          :color 'white}]]]]]])
 
 (def form
-  [:form
-   {:width   (percent 90)
-    :margin  [[0 'auto]]
-    :padding (px 30)}
+  [[:form
+    {:width   (percent 90)
+     :margin  [[0 'auto]]
+     :padding (px 30)}]
    [:div.formic-fields
     ["> div.formic-field"
      {:border-radius (px 6)
@@ -171,10 +171,6 @@
     {:border  'none
      :padding 0
      :margin  0}]
-   field-flex
-   field-photo-credit
-   compound-field
-   datepicker
    [:.formic-flex-add
     [:a.button
      {:border [[(px 1) 'solid "#2f59a3"]]
@@ -250,4 +246,9 @@
     {:background "#e6e9ec"
      :font-family ['YuGothic 'sans-serif]
      :font-size (px 14)}
-    form]])
+    form
+    field-flex
+    field-photo-credit
+    compound-field
+    datepicker
+    ]])

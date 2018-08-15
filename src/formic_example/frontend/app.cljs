@@ -6,7 +6,6 @@
             [formic.components.date-picker :as dp]
             [formic.components.google-map :as gm]
             [formic.components.quill :as quill]
-            #_[formic.components.history :as history]
             [formic.field :as formic-field]
             [formic.frontend :as formic-frontend]
             [formic.util :as u]
@@ -46,8 +45,9 @@
     {:id :date-created
      :default (t/today)
      :type :formic-datepicker
-     :active? date-active?
-     :validation [st/required validate-date]}
+     :validation [st/required validate-date]
+     :options {:active? date-active?}
+     }
     {:id :title-type
      :type :radios
      :options {"wide" "Wide"
@@ -150,9 +150,10 @@
    :fields form-fields})
 
 (defn serialized [form-state]
-  [:pre (with-out-str
-          (cljs.pprint/pprint 
-           (formic-field/serialize form-state)))])
+  [:pre
+   (with-out-str
+     (cljs.pprint/pprint 
+      (formic-field/serialize form-state)))])
 
 (def values 
   {:page-data
@@ -182,7 +183,7 @@
     (fn [form-schema] 
       [:div "Parent component"
        [:form
-        [formic-frontend/formic-fields form-state]]
+        [formic-frontend/fields form-state]]
        [serialized form-state]])))
 
 (defn init []

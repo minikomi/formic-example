@@ -23,7 +23,7 @@
                  [co.poyo/formic-datepicker "0.1.0-SNAPSHOT"]
                  [co.poyo/formic-quill "0.1.0-SNAPSHOT"]
                  [garden "1.3.5"]
-                 [reagent "0.7.0"]])
+                 [reagent "0.8.1"]])
 
 (require
  '[tasks.garden]
@@ -48,7 +48,7 @@
   (comp
    (tasks.garden/build-garden :styles-var 'formic-example.styles.core/combined
                               :output-to "public/css/styles.css"
-                              :pretty-print (get-env :debug false))))
+                              :pretty-print (boolean (get-env :debug false)))))
 
 (deftask build-frontend
   "This task contains all the necessary steps to produce a build
@@ -62,16 +62,33 @@
 (deftask set-options []
   (task-options!
    ;;frontend
-   cljs {:optimizations (if (get-env :debug) :none :advanced)
+   cljs {:optimizations (if (not= (get-env :debug) :debug)
+                          :advanced
+                          :none)
          :compiler-options
-         {:closure-defines {'goog.DEBUG (get-env :debug false)}
+         {:pseudo-names (= (get-env :debug) :pseudo)
+          :closure-defines {'goog.DEBUG (get-env :debug false)}
           :parallel-build true}})
   identity)
 
 (deftask dev
   "Simple alias to run application in development mode"
   []
-  (set-env! :debug true)
+  (set-env! :debug :debug)
+  (comp
+   (set-options)
+   (cider)
+   (serve :dir "target/public" :port 3042)
+   (watch)
+   (cljs-repl)
+   (reload)
+   (build-frontend)
+   (target)))
+
+(deftask pseudo
+  "Simple alias to run application in development mode"
+  []
+  (set-env! :debug :pseudo)
   (comp
    (set-options)
    (cider)
