@@ -13,6 +13,7 @@
     :border        [[(px 1) 'solid "#e2e2e2"]]
     :box-shadow [[0 0 (px 13) "rgba(0,0,0,0.1)"]]
     :border-radius (px 6)
+    :overflow 'hidden
     :padding       (px 8)}
    [:h4
     {:margin    0

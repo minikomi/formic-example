@@ -184,7 +184,12 @@
       [:div "Parent component"
        [:form
         [formic-frontend/fields form-state]]
-       [serialized form-state]])))
+       [serialized form-state]
+       [:button
+        {:on-click (fn [ev]
+                     (.preventDefault ev)
+                     (formic-field/touch-all! form-state)
+                     (cljs.pprint/pprint (formic-field/validate-all form-state)))}]])))
 
 (defn init []
   (reagent/render-component
