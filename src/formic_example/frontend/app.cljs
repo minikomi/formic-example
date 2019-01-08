@@ -6,15 +6,26 @@
             [formic.components.date-picker :as dp]
             [formic.components.google-map :as gm]
             [formic.components.quill :as quill]
+            [formic.components.imagemodal :as imagemodal]
             [formic.field :as formic-field]
             [formic.frontend :as formic-frontend]
             [formic.util :as u]
             [formic.validation :as fv]
             [goog.dom :as gdom]
+            [ajax.core :as ajax]
+            [ajax.formats :as ajax-fmt]
             [reagent.core :as r]
             [struct.core :as st]
             [cljs.pprint]
             ))
+
+(defn dev-setup []
+  (if goog.DEBUG
+    (do (enable-console-print!)
+        (println "dev mode"))
+    (set! *print-fn* (fn [& _]))))
+
+(def images-cache (atom []))
 
 (def url-regex #"https?://(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)")
 
@@ -41,7 +52,40 @@
      :validation [st/required]}
     {:id :page-type
      :type :radios
-     :options {"photo" "Photo"}}
+     :choices {"photo" "Photo"}}
+    {:id :hero-image
+     :type :formic-imagemodal
+     :options {:endpoints {:list "https://api.unsplash.com/photos/?client_id=8f062abdd94634c81701ddd1e02a62089396f1088b973b632d93ab45157e7c92&per_page=30"}
+               :paging true
+               :image->title
+               (constantly false)
+               :image->thumbnail
+               (fn [img]
+                 (str (get-in img ["urls" "small"])
+                      "?w=100&h=100&fit=clamp"))
+               :list-images-fn
+               (fn [endpoints state]
+                 (swap! state assoc
+                        :mode :loading
+                        :current-images nil)
+                 (ajax/GET
+                  (str (:list endpoints)
+                       "&page=" (:current-page @state))
+                  {:response-format
+                   (ajax/ring-response-format {:format (ajax/json-response-format)})
+                   :handler
+                   (fn [resp]
+                     (println (get-in resp [:headers "x-total"]))
+                     (swap! state assoc
+                            :mode :loaded
+                            :next-page (when-let [total-str (get-in resp [:headers "x-total"])]
+                                           (> (js/parseInt total-str)
+                                              (* 30 (:current-page @state 1))))
+                            :prev-page (> 0 (:current-page @state))
+                            :current-images (:body resp)
+                      )
+                     )}))
+               }}
     {:id :date-created
      :default (t/today)
      :type :formic-datepicker
@@ -50,7 +94,7 @@
      }
     {:id :title-type
      :type :radios
-     :options {"wide" "Wide"
+     :choices {"wide" "Wide"
                "normal" "Normal"}
      :validation [st/required]}
     {:id :subtitle-text
@@ -95,35 +139,9 @@
     {:id :names
      :flex [:name]}]})
 
-(def test-images ["https://images.dog.ceo/breeds/hound-afghan/n02088094_1003.jpg",
-                  "https://images.dog.ceo/breeds/hound-afghan/n02088094_1007.jpg",
-                  "https://images.dog.ceo/breeds/hound-afghan/n02088094_1023.jpg",
-                  "https://images.dog.ceo/breeds/hound-afghan/n02088094_10263.jpg",
-                  "https://images.dog.ceo/breeds/hound-afghan/n02088094_10715.jpg",
-                  "https://images.dog.ceo/breeds/hound-afghan/n02088094_10822.jpg",
-                  "https://images.dog.ceo/breeds/hound-afghan/n02088094_10832.jpg",
-                  "https://images.dog.ceo/breeds/hound-afghan/n02088094_10982.jpg",
-                  "https://images.dog.ceo/breeds/hound-afghan/n02088094_11006.jpg",
-                  "https://images.dog.ceo/breeds/hound-afghan/n02088094_11172.jpg",
-                  "https://images.dog.ceo/breeds/hound-afghan/n02088094_11182.jpg",
-                  "https://images.dog.ceo/breeds/hound-afghan/n02088094_1126.jpg",
-                  "https://images.dog.ceo/breeds/hound-afghan/n02088094_1128.jpg",
-                  "https://images.dog.ceo/breeds/hound-afghan/n02088094_11432.jpg",
-                  "https://images.dog.ceo/breeds/hound-afghan/n02088094_1145.jpg",
-                  "https://images.dog.ceo/breeds/hound-afghan/n02088094_115.jpg"])
-
 (def photo-credit-field
   {:fields
-   [{:id :images
-     :type :checkboxes
-     :options
-     (map-indexed
-      (fn [n src]
-        [n
-         [:img
-          {:src src}]])
-      test-images)}
-    {:id :photo-text
+   [{:id :photo-text
      :type :formic-quill
      :validation [st/required]}]})
 
@@ -191,9 +209,13 @@
                      (formic-field/touch-all! form-state)
                      (cljs.pprint/pprint (formic-field/validate-all form-state)))}]])))
 
-(defn init []
+(defn mount []
   (reagent/render-component
    [form-component form-schema]
    (.getElementById js/document "container")))
+
+(defn init []
+  (dev-setup)
+  (mount))
 
 (init)

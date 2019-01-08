@@ -1,28 +1,31 @@
 (set-env!
  :source-paths    #{"src"}
  :resource-paths  #{"resources"}
- :checkouts '[[co.poyo/formic "0.1.0-SNAPSHOT"]
+ :checkouts '[[co.poyo/formic "0.1.3"]
               [co.poyo/formic-datepicker "0.1.0-SNAPSHOT"]
-              [co.poyo/formic-google-map "0.1.0-SNAPSHOT"]
-              [co.poyo/formic-quill "0.1.0-SNAPSHOT"]
-              ]
+              [co.poyo/formic-imagemodal "0.1.0-SNAPSHOT"]
+              [co.poyo/formic-quill "0.1.0-SNAPSHOT"]]
  :dependencies '[;; pin deps
-                 [org.clojure/clojure "1.8.0"]
-                 [org.clojure/clojurescript "1.10.238"]
-                 [adzerk/boot-cljs          "2.1.4"      :scope "test"]
-                 [adzerk/boot-cljs-repl     "0.3.3"      :scope "test"]
+                 [org.clojure/clojure "1.10.0"]
+                 [org.clojure/clojurescript "1.10.439"]
+                 [adzerk/boot-cljs          "2.1.5"      :scope "test"]
+                 [adzerk/boot-cljs-repl     "0.4.0"      :scope "test"]
                  [adzerk/boot-reload        "0.5.2"      :scope "test"]
                  [co.poyo/formic-google-map "0.1.0-SNAPSHOT"]
                  [pandeiro/boot-http        "0.8.3"      :scope "test"
                   :exclusions [org.clojure]]
-                 [com.cemerick/piggieback   "0.2.2"      :scope "test"]
+                 [cider/piggieback          "0.3.9"      :scope "test"]
                  [org.clojure/tools.nrepl   "0.2.13"     :scope "test"]
+                 [nrepl "0.4.5" :scope "test"]
                  [weasel                    "0.7.0"      :scope "test"]
-                 [funcool/struct "1.2.0"]
-                 [co.poyo/formic "0.1.0-SNAPSHOT"]
+                 [funcool/struct "1.3.0"]
+                 [cljs-ajax "0.7.5"]
+                 ;; forms
+                 [co.poyo/formic "0.1.3"]
+                 [co.poyo/formic-imagemodal "0.1.0-SNAPSHOT"]
                  [co.poyo/formic-datepicker "0.1.0-SNAPSHOT"]
                  [co.poyo/formic-quill "0.1.0-SNAPSHOT"]
-                 [garden "1.3.5"]
+                 [garden "1.3.6"]
                  [reagent "0.8.1"]])
 
 (require
@@ -37,8 +40,8 @@
                   '[blooming.repl :refer [start! stop! restart!]])
   (require 'boot.repl)
   (swap! @(resolve 'boot.repl/*default-dependencies*)
-         concat '[[cider/cider-nrepl "0.17.0-SNAPSHOT"]
-                  [refactor-nrepl "2.4.0-SNAPSHOT"]])
+         concat '[[cider/cider-nrepl "0.19.0"]
+                  [refactor-nrepl "2.4.0"]])
   (swap! @(resolve 'boot.repl/*default-middleware*)
          concat '[cider.nrepl/cider-middleware
                   refactor-nrepl.middleware/wrap-refactor])
