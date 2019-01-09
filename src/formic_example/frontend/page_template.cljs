@@ -1,10 +1,10 @@
 (ns formic-example.frontend.page-template
   (:require [reagent.core :as r]
-            [reagent.impl.component :refer [extract-props]]
-            ))
+            [reagent.impl.component :refer [extract-props]]))
 
 (defn title-wide [{:keys [page-data]}]
   [:div.title-wide
+
    {:style (if (:hero-image page-data)
              {:background-position 'center
               :background-color "#777"
@@ -12,14 +12,16 @@
               :background-size 'cover
               :background-image (str "url(" (:hero-image page-data) "&w=600&h=400)")}
              {:background-color "#777"})
-    :class [:w-100 :pv5 :tc :white]}
-   [:h1
-    {:class [:w-100 :tc :w2]}
-    (:title-text page-data)]
-   [:h2
-    (:date-created page-data)]
-   (when (:subtitle-text page-data)
-     [:h3 (:subtitle-text page-data)])])
+    :class [:w-100 :pv5 :tc]}
+   [:div.txt
+    {:style {:color (:title-color page-data)}}
+    [:h1
+     {:class [:w-100 :tc :w2]}
+     (:title-text page-data)]
+    [:h2
+     (:date-created page-data)]
+    (when (:subtitle-text page-data)
+      [:h3 (:subtitle-text page-data)])]])
 
 (defn title-normal [{:keys [page-data]}]
   [:div.title-normal
@@ -32,7 +34,8 @@
                :w-40
                :h5]}])
    [:div.title-txt
-    {:class [:dib :w-60 :v-top :pl4]}
+    {:style {:color (:title-color page-data)}
+     :class [:dib :w-60 :v-top :pl4]}
     [:h1
      {:class []}
      (:title-text page-data)]
@@ -42,8 +45,7 @@
       [:h3 (:subtitle-text page-data)])]])
 
 (defn gallery [field]
-  [:pre (prn-str field)]
-  )
+  [:pre (prn-str field)])
 
 (defn paragraph [field render-quill]
   (let [el (r/atom nil)]
@@ -53,14 +55,14 @@
         (.setContents render-quill
                       (clj->js (:body field)))
         [:div.paragraph
-         {:class [:pv2 :f5 :w-90 :ma0]
-          :dangerouslySetInnerHTML
-          {:__html (.. render-quill -root -innerHTML)}}])})))
-
-(defn subheader [field]
-  [:h3.subheader
-   {:class [:f4]}
-   (:text field)])
+         (when (:title field)
+           [:h3.subheader
+            {:class [:f4]}
+            (:title field)])
+         [:div.paragraph-contents
+          {:class [:pv2 :f5 :w-90 :ma0]
+           :dangerouslySetInnerHTML
+           {:__html (.. render-quill -root -innerHTML)}}]])})))
 
 (defn page [data]
   (let [render-quill
@@ -79,5 +81,5 @@
           [:div.body-field
            (case (:compound field)
              :gallery [gallery field]
-             :subheader [subheader field]
-             :paragraph [paragraph field render-quill])]))])))
+             :paragraph [paragraph field render-quill])]))
+       [:pre (with-out-str (cljs.pprint/pprint data))]])))

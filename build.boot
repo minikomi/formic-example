@@ -25,6 +25,8 @@
                  [co.poyo/formic-imagemodal "0.1.0-SNAPSHOT"]
                  [co.poyo/formic-datepicker "0.1.0-SNAPSHOT"]
                  [co.poyo/formic-quill "0.1.0-SNAPSHOT"]
+                 [cljsjs/react "16.6.0-0"]
+                 [cljsjs/react-color "2.13.8-0"]
                  [garden "1.3.6"]
                  [reagent "0.8.1"]])
 

@@ -19,6 +19,7 @@
             [formic-example.frontend.form-styles :as form-styles]
             [cljs.pprint]
             [formic-example.frontend.page-template :as page-template]
+            [formic-example.frontend.color-picker :as color-picker]
             ))
 
 (defn dev-setup []
@@ -55,26 +56,26 @@
                         "&page=" (inc (:current-page @state 0))
                         "&query=" (:search-str @state))
                    (str (:list endpoints) "&page=" (inc (:current-page @state 0))))]
-   (ajax/GET endpoint
-    {:response-format
-     (ajax/ring-response-format {:format (ajax/json-response-format)})
-     :error-handler (formic-imagemodal/default-error-handler state)
-     :handler
-     (fn [resp]
-       (swap! state assoc
-              :mode :loaded
-              :next-page
-              (when-let [total-str (get-in resp [:headers "x-total"])]
-                (> (js/parseInt total-str)
-                   (* 30 (inc (:current-page @state 0)))))
-              :prev-page
-              (> 0 (:current-page @state))
-              :current-images
-              (mapv
-               #(get-in % ["urls" "raw"])
-               (if-let  [results (get-in resp [:body "results"])]
-                 results
-                 (:body resp)))))})))
+    (ajax/GET endpoint
+              {:response-format
+               (ajax/ring-response-format {:format (ajax/json-response-format)})
+               :error-handler (formic-imagemodal/default-error-handler state)
+               :handler
+               (fn [resp]
+                 (swap! state assoc
+                        :mode :loaded
+                        :next-page
+                        (when-let [total-str (get-in resp [:headers "x-total"])]
+                          (> (js/parseInt total-str)
+                             (* 30 (inc (:current-page @state 0)))))
+                        :prev-page
+                        (> 0 (:current-page @state))
+                        :current-images
+                        (mapv
+                         #(get-in % ["urls" "raw"])
+                         (if-let  [results (get-in resp [:body "results"])]
+                           results
+                           (:body resp)))))})))
 
 (def imagemodal-options
   {:endpoints {:list "https://api.unsplash.com/photos/?client_id=8f062abdd94634c81701ddd1e02a62089396f1088b973b632d93ab45157e7c92&per_page=30"
@@ -111,6 +112,8 @@
      :choices {"normal" "Normal"
                "wide" "Wide"}
      :validation [st/required]}
+    {:id :title-color
+     :type :color-picker}
     {:id :subtitle-text
      :label "Subtitle (optional)"
      :type :string
@@ -123,9 +126,6 @@
 
 (def compound-fields
   {:page page-details-field
-   :subheader {:fields [{:id :text
-                         :type :string
-                         :validation [st/required]}]}
    :captioned-image {:fields
                      [{:id :image
                        :type :formic-imagemodal
@@ -134,7 +134,10 @@
                       {:id :caption
                        :type :string}]}
    :paragraph {:fields
-               [{:id :body
+               [{:id :title
+                 :title "Title (optional)"
+                 :type :string}
+                {:id :body
                  :type :formic-quill
                  :validation [quill-required]}]}
    :gallery {:fields
@@ -145,10 +148,11 @@
   [{:id :page-data
     :compound :page}
    {:id :article-body
-    :flex [:subheader :paragraph :gallery]}])
+    :flex [:paragraph :gallery]}])
 
 (def form-schema
   {:id :test-form
+   :components {:color-picker color-picker/component}
    :compound compound-fields
    :fields form-fields
    :classes form-styles/combined})
