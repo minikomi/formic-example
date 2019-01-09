@@ -18,6 +18,7 @@
             [struct.core :as st]
             [formic-example.frontend.form-styles :as form-styles]
             [cljs.pprint]
+            [formic-example.frontend.page-template :as page-template]
             ))
 
 (defn dev-setup []
@@ -69,9 +70,11 @@
               :prev-page
               (> 0 (:current-page @state))
               :current-images
-              (if-let  [results (get-in resp [:body "results"])]
-                results
-                (:body resp))))})))
+              (mapv
+               #(get-in % ["urls" "raw"])
+               (if-let  [results (get-in resp [:body "results"])]
+                 results
+                 (:body resp)))))})))
 
 (def imagemodal-options
   {:endpoints {:list "https://api.unsplash.com/photos/?client_id=8f062abdd94634c81701ddd1e02a62089396f1088b973b632d93ab45157e7c92&per_page=30"
@@ -82,12 +85,12 @@
    (constantly false)
    :image->src
    (fn [img]
-     (str (get-in img ["urls" "raw"])
+     (str img
           "&w=300&h=300&fit=clamp"))
    :image->thumbnail
    (fn [img]
-     (str (get-in img ["urls" "raw"])
-          "&w=200&h=200&fit=clamp"))
+     (str img
+          "&w=300&h=300&fit=clamp"))
    :list-images-fn list-images-fn})
 
 (def page-details-field
@@ -147,7 +150,6 @@
 (def form-schema
   {:id :test-form
    :compound compound-fields
-   :serializers {:formic-imagemodal #(get-in % ["urls" "raw"])}
    :fields form-fields
    :classes form-styles/combined})
 
@@ -186,7 +188,8 @@
       [:div "Parent component"
        [:form
         [formic-frontend/fields form-state]]
-       [serialized form-state]
+       [page-template/page
+        (formic-field/serialize form-state)]
        [:button
         {:on-click (fn [ev]
                      (.preventDefault ev)
