@@ -3,101 +3,220 @@
    [garden.selectors :as gs]
    [garden.units :refer [em percent px]]))
 
-(def field-flex
-  [:.formic-flex-field
-   {:position      'relative
-    :list-style    'none
-    :margin        [[(percent 2) 'auto]]
-    :background    "#f2f2f2"
-    :width         (percent 98)
-    :border        [[(px 1) 'solid "#e2e2e2"]]
-    :box-shadow [[0 0 (px 13) "rgba(0,0,0,0.1)"]]
-    :border-radius (px 6)
-    :overflow 'hidden
-    :padding       (px 8)}
-   [:h4
-    {:margin    0
-     :font-size (px 12)
-     :padding   (px 6)}]
-   [:.formic-flex-controls
-    {:margin     0
-     :padding    0
-     :position   'absolute
-     :right      (px 10)
-     :top        (px 10)
-     :text-align 'right}
-    [:li
-     {:list-style 'none
-      :display    'inline-block}
-     [:a
-      {:display         'block
-       :padding         (px 4)
-       :font-size       (px 12)
-       :line-height     (px 12)
-       :text-decoration 'none
-       :color           'black
-       :margin-left     (px 2)
-       :width           (px 22)
-       :text-align      'center
-       :border          [[(px 1) 'solid "#ccc"]]
-       :background      'white}
-      [:&.disabled
-       {:cursor  'normal
-        :opacity 0.2}]]]]])
+(def image-modal-close
+  [:.formic-image-modal-close
+   {:display 'block
+    :position 'fixed
+    :top 0
+    :right 0
+    :padding (px 10)
+    :font-size (px 20)
+    :line-height (px 20)
+    :color 'white}
+   [:&:hover
+    {:opacity 0.6}]])
 
-(def field-photo-credit
-  [:.formic-compound.photo-credit
-   [:.formic-checkboxes
-    [:ul
-     {:width (percent 90)
-      :margin 0
-      :padding 0
-      :display 'inline-block}]
-    [:li
-     {:display      'inline-block
-      :background   "#fff"
-      :border       [[(px 1) 'solid "#ccc"]]
-      :line-height  0
-      :padding      (px 4)
-      :margin-right (px 10)}
-     [:img
-      {:display 'inline-block
-       :height  (px 40)}]
-     [:input
-      {:vertical-align 'top
-       :margin-top     (px 14)
-       :margin-right   (px 10)}]]]])
-
-(def compound-field
-  [:ul.formic-compound-fields
-   {:margin  [[(px 10) 0]]
-    :padding (px 10)}
-   ["> li"
+(def image-modal-panel-select
+  [:ul.formic-image-modal-panel-select
+   {:display 'block
+    :padding 0
+    :width (percent 100)
+    :border-bottom [[(px 1) "#444" 'solid]]
+    :margin 0}
+   [:li
     {:list-style 'none
-     :margin     [[(px 10) 0]]
-     :padding    0}
-    [:span.formic-input-title
-     {:font-weight    'bold
-      :vertical-align 'top
-      :display        'inline-block
-      :width (percent 10)
-      :padding-bottom (px 5)
-      :margin-bottom  (px 5)
-      :font-size      (px 12)}]]])
+     :vertical-align 'bottom
+     :border 'none
+     :display 'inline-block}
+    [:a
+     {:display 'block
+      :padding [[(px 10) (px 30)]]
+      :border-radius [[(px 4) (px 4) 0 0]]
+      :font-size (px 12)
+      :margin-bottom (px -1)
+      :background "#fefefe"
+      :border-right [[(px 1) 'solid "#444"]]
+      :border-top [[(px 1) 'solid "#444"]]
+      :border-bottom [[(px 1) 'solid "#444"]]
+      :margin-left (px 5)}
+     ["&:first-child"
+      {:border-left [[(px 1) 'solid "#444"]]}]]
+    [:&.active
+     [:a
+      {:border-bottom [[(px 1) 'solid 'white]]
+       :background 'white}]]]])
+
+(def image-modal-current
+  [:.formic-image-modal-current
+   {:display 'block
+    :width (percent 50)
+    :margin [[(px 20) 'auto]]}
+   [:&:hover
+    {:opacity 0.8}]
+   [:img
+    {:display 'block
+     :width (percent 100)}]
+   [:span
+    {:display 'block
+     :text-align 'left
+     :padding-bottom (px 5)
+     :width (percent 100)}]])
+
+(def image-modal-search
+  [:.formic-image-modal-search
+     {:text-align 'center}
+     [:input
+      {:display 'inline-block
+       :width (percent 60)
+       :border [[(px 1) 'solid "#444"]]
+       :padding (px 10)
+       :font-size (px 14)
+       :line-height (px 14)}]
+     [:a
+      {:display 'inline-block
+       :border [[(px 1) 'solid "#666"]]
+       :margin-left (px 2)
+       :padding (px 10)
+       :font-size (px 14)
+       :line-height (px 14)}]])
+
+(def image-modal-grid
+  [:.formic-image-modal-grid
+     {:display 'block
+      :padding 0
+      :margin [[(px 20) 0 0 0]]}
+     [:li
+      {:list-style 'none
+       :display 'inline-block
+       :box-sizing 'border-box
+       :vertical-align 'top
+       :height 'auto
+       :width (percent 20)
+       :text-align 'center}
+      [:a
+       {:display 'block
+        :padding (px 5)}
+       [:&:hover
+        {:background "#ddd"}]]
+      [:&.selected
+       {:border [[(px 1) 'solid 'red]]}]
+      [:img
+       {:vertical-align 'top
+        :display 'inline-block
+        :height 'auto
+        :width (percent 100)
+        :cursor 'pointer}]]])
+
+(def image-modal-paging
+  [:.formic-image-modal-paging
+   {:width (percent 100)
+    :margin-top (px 20)}
+   [:li
+    {:display 'inline-block
+     :text-align 'center
+     :line-height (px 14)
+     :font-size (px 14)
+     :vertical-align 'top}]
+   [:.formic-image-modal-prev
+    :.formic-image-modal-next
+    {:width (percent 20)
+     :text-align 'center}
+    [:.button
+     {:color 'white
+      :background "#444"
+      :border [[(px 1) 'solid "#444"]]
+      :border-radius (px 4)
+      :padding [[(px 5) (px 20)]]
+      :display 'inline-block}
+     [:&:hover
+      {:background 'white
+       :color "#444"}]]]
+   [:.formic-image-modal-page-number
+    {:width (percent 60)}]])
+
+(def image-modal
+  [[:body.formic-image-modal-open
+    {:overflow-y 'hidden}]
+   [:.formic-image-field
+    {:position 'relative}
+    [:.formic-image-modal
+     {:position 'fixed
+      :top 0
+      :bottom 0
+      :right 0
+      :left 0
+      :z-index 1000
+      :background "rgba(0,0,0,0.5)"}]
+    [:.formic-image-modal-inner
+     {:background 'white
+      :box-sizing 'border-box
+      :padding (px 30)
+      :width (percent 90)
+      :position 'absolute
+      :overflow-y 'scroll
+      :height (percent 90)
+      :top (percent 5)
+      :left (percent 5)}]
+    image-modal-panel-select
+    image-modal-close
+    image-modal-current
+    image-modal-search
+    image-modal-grid
+    image-modal-paging
+    [:.dropzone
+     {:width (percent 90)
+      :margin-left (percent 5)
+      :margin-top (px 30)}]]])
+
+(def image-current
+  [:.formic-image-open-modal
+   {:display 'block
+    :text-align 'center
+    :cursor 'pointer
+    :margin-left 'auto
+    :margin-right 'auto
+    :position 'relative}
+   [:.formic-image-current
+    {:height 'auto
+     :width (percent 100)
+     :display 'block}]
+   [:.formic-image-open-modal-label-wrapper
+    {:position 'absolute
+     :width (percent 100)
+     :top 0
+     :left 0
+     :opacity 0
+     :transition-duration "0.2s"
+     :transition-easing 'ease-out
+     :height (percent 100)
+     :background "rgba(0,0,0,0.4)"}
+    [:&:hover
+     {:opacity 1
+      :transition-easing 'ease-out
+      :transition-duration "0.2s"}]
+    [:.formic-image-open-modal-label
+     {:color 'white
+      :top (percent 50)
+      :position 'absolute
+      :left 0
+      :right 0
+      :text-align 'center
+      :font-size (px 14)
+      :line-height (px 14)
+      :margin-top (px -8)}]]])
 
 (def datepicker
-  [:.date-picker
+  [:.formic-date-picker
    {:position 'relative
     :width (percent 100)}
    [:.date-picker-table-wrapper
     {:border [['solid (px 1) "#e2e2e2"]]
-     :position 'absolute
      :z-index 100
      :background 'white
-     :width (percent 40)
-     :left (percent 10)
-     :top (px 30)
-     :box-shadow [[0 (px 3) (px 13) "rgba(0,0,0,0.1)"]]
+     :width (percent 100)
+     :left (percent 0)
+     :top 0
+     :box-shadow [[0 (px 3) (px 13) "rgba(0,0,0,0.2)"]]
      :padding (px 10)}]
    [:td
     {:user-select 'none}]
@@ -151,105 +270,32 @@
 
 (def form
   [[:form
-    {:width   (percent 90)
-     :margin  [[0 'auto]]
-     :padding (px 30)}]
-   [:div.formic-fields
-    ["> div.formic-field"
-     {:border-radius (px 6)
-      :background    'white
-      :margin-top    (px 30)
-      :padding       0}
-     ["> .formic-compound > h4.formic-compound-title"
-      "> .formic-flex > h4.formic-flex-title"
-      {:margin        0
-       :padding       (px 10)
-       :background    "#2f59a3"
-       :color         'white
-       :border-radius [[(px 6) (px 6) 0 0]]
-       :border-bottom [[(px 1) 'solid "#e2e2e2"]]}]]]
-   [:fieldset
-    {:border  'none
-     :padding 0
-     :margin  0}]
-   [:.formic-flex-add
-    [:a.button
-     {:border [[(px 1) 'solid "#2f59a3"]]
-      :color "#2f59a3"
-      :border-radius (px 4)
-      :text-decoration 'none
-      :padding (px 8)}
-     [:span.plus
-      {:font-weight 'bold
-       :font-family 'courier
-       :font-size (px 15)
-       :margin-right (px 6)}]
-     [:&:hover
-      {:cursor 'pointer
-       :background-color "#2f59a3"
-       :color 'white}]]]
-   [:.formic-google-map
-    {:display 'inline-block
-     :width (percent 90)}
-    [:.formic-map-wrapper
-     [:.formic-map-holder
-      {:margin-top (px 10)}
-      {:height (px 450)
-       :width (percent 100)}]]
-    [:.formic-lat-lng
-     {:margin-top (px 10)}
-     [:span
-      {:display 'inline-block
-       :font-size (px 12)
-       :font-weight 'bold
-       :margin [[(px 10) (px 10) 0 0]]}]
-     [:input
-      {:padding (px 5)
-       :background "#fafafa"
-       :margin-right (px 10)}]]
-    [:.formic-auto-complete
-     [:span
-      {:display 'inline-block
-       :font-size (px 12)
-       :font-weight 'bold
-       :width (percent 5)}]
-     [:input
-      {:display 'inline-block
-       :margin-left (percent 2)
-       :padding [[(px 5)]]
-       :width (percent 93)}]]]
-   [:textarea
-    {:min-height (px 200)
-     :min-width  (px 500)}]
+    {:width (percent 30)
+     :position 'fixed
+     :left 0
+     :top 0
+     :bottom 0
+     :background "#e6e9ec"
+     :overflow-x 'hidden
+     :border-right [[(px 3) 'solid "#444"]]
+     :padding (px 10)
+     :overflow-y 'scroll}
+    ]
    [:.formic-quill
     [:.formic-quill-editor-wrapper
      {:background 'white
-      :width (percent 90)
-      :display 'inline-block}]]
-   [:input
-    [(gs/& (gs/attr :type := :text))
-     {:border              [[(px 1) 'solid "#e2e2e2"]]
-      :width               (percent 90)
-      :display             'inline-block
-      :vertical-align 'top
-      "-webkit-appearance" 'none
-      :padding             [[(px 8) (px 4)]]}]]
-   [".error > h3"
-    {:color "red"}]
-   [".error > label > input[type=text]"
-    {:background "fff3ee"}]])
+      :width (percent 100)
+      :display 'block}]]])
 
 (def combined
   [[:*
     {:box-sizing 'border-box
      :appearance 'none}]
    [:body
-    {:background "#e6e9ec"
-     :font-family ['YuGothic 'sans-serif]
+    {:font-family ['YuGothic 'sans-serif]
      :font-size (px 14)}
+    [:#serialized
+     {:padding-left (percent 35)}]
     form
-    field-flex
-    field-photo-credit
-    compound-field
-    datepicker
-    ]])
+    image-modal
+    datepicker]])

@@ -6,7 +6,7 @@
             [formic.components.date-picker :as dp]
             [formic.components.google-map :as gm]
             [formic.components.quill :as quill]
-            [formic.components.imagemodal :as imagemodal]
+            [formic.components.imagemodal :as formic-imagemodal]
             [formic.field :as formic-field]
             [formic.frontend :as formic-frontend]
             [formic.util :as u]
@@ -16,6 +16,7 @@
             [ajax.formats :as ajax-fmt]
             [reagent.core :as r]
             [struct.core :as st]
+            [formic-example.frontend.form-styles :as form-styles]
             [cljs.pprint]
             ))
 
@@ -25,9 +26,8 @@
         (println "dev mode"))
     (set! *print-fn* (fn [& _]))))
 
-(def images-cache (atom []))
-
-(def url-regex #"https?://(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)")
+(def url-regex
+  #"https?://(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)")
 
 (def validate-url
   {:message "有効なURLを入力してください"
@@ -45,130 +45,114 @@
    :optional true
    :validate date-active?})
 
+(defn list-images-fn [endpoints state]
+  (swap! state assoc
+         :mode :loading
+         :current-images nil)
+  (let [endpoint (if (:search-str @state)
+                   (str (:search endpoints)
+                        "&page=" (inc (:current-page @state 0))
+                        "&query=" (:search-str @state))
+                   (str (:list endpoints) "&page=" (inc (:current-page @state 0))))]
+   (ajax/GET endpoint
+    {:response-format
+     (ajax/ring-response-format {:format (ajax/json-response-format)})
+     :error-handler (formic-imagemodal/default-error-handler state)
+     :handler
+     (fn [resp]
+       (swap! state assoc
+              :mode :loaded
+              :next-page
+              (when-let [total-str (get-in resp [:headers "x-total"])]
+                (> (js/parseInt total-str)
+                   (* 30 (inc (:current-page @state 0)))))
+              :prev-page
+              (> 0 (:current-page @state))
+              :current-images
+              (if-let  [results (get-in resp [:body "results"])]
+                results
+                (:body resp))))})))
+
+(def imagemodal-options
+  {:endpoints {:list "https://api.unsplash.com/photos/?client_id=8f062abdd94634c81701ddd1e02a62089396f1088b973b632d93ab45157e7c92&per_page=30"
+               :search "https://api.unsplash.com/search/photos/?client_id=8f062abdd94634c81701ddd1e02a62089396f1088b973b632d93ab45157e7c92&per_page=30"}
+   :paging true
+   :search true
+   :image->title
+   (constantly false)
+   :image->src
+   (fn [img]
+     (str (get-in img ["urls" "raw"])
+          "&w=300&h=300&fit=clamp"))
+   :image->thumbnail
+   (fn [img]
+     (str (get-in img ["urls" "raw"])
+          "&w=200&h=200&fit=clamp"))
+   :list-images-fn list-images-fn})
+
 (def page-details-field
   {:fields
    [{:id :title-text
      :type :string
      :validation [st/required]}
-    {:id :page-type
-     :type :radios
-     :choices {"photo" "Photo"}}
     {:id :hero-image
      :type :formic-imagemodal
-     :options {:endpoints {:list "https://api.unsplash.com/photos/?client_id=8f062abdd94634c81701ddd1e02a62089396f1088b973b632d93ab45157e7c92&per_page=30"}
-               :paging true
-               :image->title
-               (constantly false)
-               :image->thumbnail
-               (fn [img]
-                 (str (get-in img ["urls" "small"])
-                      "?w=100&h=100&fit=clamp"))
-               :list-images-fn
-               (fn [endpoints state]
-                 (swap! state assoc
-                        :mode :loading
-                        :current-images nil)
-                 (ajax/GET
-                  (str (:list endpoints)
-                       "&page=" (:current-page @state))
-                  {:response-format
-                   (ajax/ring-response-format {:format (ajax/json-response-format)})
-                   :handler
-                   (fn [resp]
-                     (println (get-in resp [:headers "x-total"]))
-                     (swap! state assoc
-                            :mode :loaded
-                            :next-page (when-let [total-str (get-in resp [:headers "x-total"])]
-                                           (> (js/parseInt total-str)
-                                              (* 30 (:current-page @state 1))))
-                            :prev-page (> 0 (:current-page @state))
-                            :current-images (:body resp)
-                      )
-                     )}))
-               }}
+     :options imagemodal-options}
     {:id :date-created
      :default (t/today)
      :type :formic-datepicker
      :validation [st/required validate-date]
-     :options {:active? date-active?}
-     }
+     :options {:active? date-active?}}
     {:id :title-type
      :type :radios
-     :choices {"wide" "Wide"
-               "normal" "Normal"}
+     :choices {"normal" "Normal"
+               "wide" "Wide"}
      :validation [st/required]}
     {:id :subtitle-text
+     :label "Subtitle (optional)"
      :type :string
-     :validation []}
-    {:id :issue-text
-     :type :string
-     :validation []}]
-   :validation
-   {:issue-text [[st/identical-to :subtitle-text]]}})
-
-(def name-field
-  {:fields
-   [{:id :name
-     :type :string
-     :validation [st/required]}
-    {:id :url
-     :type :string
-     :validation [validate-url]}]})
-
-(def geo-field
-  {:fields
-   [{:id :name
-     :type :string
-     :validation [st/required]}
-    {:id :location
-     :type :formic-google-map
-     :autocomplete true
      :validation []}]})
 
-(def credit-field
-  {:fields
-   [{:id :role
-     :type :select
-     :options {"hair-makeup" "HAIR & MAKE-UP"
-               "hair" "HAIR"
-               "photo" "PHOTO"
-               "model" "MODEL"
-               "clothes" "CLOTHES"
-               "styling" "STYLING"}
-     :validation [st/required]}
-    {:id :names
-     :flex [:name]}]})
-
-(def photo-credit-field
-  {:fields
-   [{:id :photo-text
-     :type :formic-quill
-     :validation [st/required]}]})
+(def quill-required
+  {:message "Required"
+   :optional true
+   :validate (fn [v] (not-empty (:txt v)))})
 
 (def compound-fields
   {:page page-details-field
-   :name name-field
-   :location geo-field
-   :credit credit-field
-   :photo-credit photo-credit-field})
+   :subheader {:fields [{:id :text
+                         :type :string
+                         :validation [st/required]}]}
+   :captioned-image {:fields
+                     [{:id :image
+                       :type :formic-imagemodal
+                       :validation [st/required]
+                       :options imagemodal-options}
+                      {:id :caption
+                       :type :string}]}
+   :paragraph {:fields
+               [{:id :body
+                 :type :formic-quill
+                 :validation [quill-required]}]}
+   :gallery {:fields
+             [{:id :images
+               :flex [:captioned-image]}]}})
 
 (def form-fields
   [{:id :page-data
     :compound :page}
-   {:id :locations
-    :flex [:location]}
-   {:id :credits
-    :flex [:credit]}
-   {:id :photo-credits
-    :flex [:photo-credit]}])
+   {:id :article-body
+    :flex [:subheader :paragraph :gallery]}])
 
 (def form-schema
   {:id :test-form
    :compound compound-fields
-   :fields form-fields})
+   :serializers {:formic-imagemodal #(get-in % ["urls" "raw"])}
+   :fields form-fields
+   :classes form-styles/combined})
 
 (defn serialized [form-state]
-  [:pre
+  [:pre#serialized
    (with-out-str
      (cljs.pprint/pprint 
       (formic-field/serialize form-state)))])
