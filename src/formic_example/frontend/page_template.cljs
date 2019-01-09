@@ -4,9 +4,9 @@
 
 (defn title-wide [{:keys [page-data]}]
   [:div.title-wide
-
    {:style (if (:hero-image page-data)
-             {:background-position 'center
+             {:text-shadow "1px 2px 3px #000"
+              :background-position 'center
               :background-color "#777"
               :background-repeat 'no-repeat
               :background-size 'cover
@@ -45,7 +45,46 @@
       [:h3 (:subtitle-text page-data)])]])
 
 (defn gallery [field]
-  [:pre (prn-str field)])
+  (let [current-image (r/atom 0)]
+    (r/create-class
+     {:component-will-update
+      (fn [_ [_ new-props]]
+        (let [images (:images new-props)]
+          (when (<= (count images) @current-image)
+            (reset! current-image 0))))
+      :reagent-render
+      (fn [field]
+        (when (some :image (:images field))
+          [:div.gallery
+           (let [i (nth (:images field) @current-image)]
+             [:div.current
+              {:class [:w-100]}
+              [:img {:src (str (:image i) "&w=600&h=400&fit=clamp")
+                     :class [:db :w-100]}]
+              [:p {:class [:dib :w-100]} (:caption i)]])
+           [:ul
+            {:class [:list :pa0 :mt2 :mh0 :relative]
+             :style {:z-index 1}}
+            (doall
+             (for [n (range (count (:images field)))
+                   :let [i (nth (:images field) n)]]
+               (when (:image i)
+                 ^{:key n}
+                 [:li
+                  {:class [:dib :w-20 :pa0]}
+                  [:a
+                   {:href "#"
+                    :class (if (= n @current-image)
+                             [:ba :b--pink :pa2 :db]
+                             [:grow :ba :b--white :pa2 :db]
+                             )
+                    :on-click (fn [ev]
+                                (.preventDefault ev)
+                                (reset! current-image n))}
+                   [:img {:class [:w-100]
+                          :src
+                          (str (:image i) "&w=100&h=100&fit=clamp")
+                          }]]])))]]))})))
 
 (defn paragraph [field render-quill]
   (let [el (r/atom nil)]
@@ -70,16 +109,19 @@
           (js/Quill. el))]
     (fn [data]
       [:div.page
-       {:style {:margin-left "35%" :width "60%"}}
+       {:style {:margin-left "35%" :width "60%"
+                :z-index 0
+                :position :relative}}
        (case (get-in data [:page-data :title-type])
          "wide" [title-wide data]
          [title-normal data])
        (doall
-        (for [n (range (count (:article-body data)))
-              :let [field (nth (:article-body data) n)]]
-          ^{:key n}
-          [:div.body-field
-           (case (:compound field)
-             :gallery [gallery field]
-             :paragraph [paragraph field render-quill])]))
+         (for [n (range (count (:article-body data)))
+               :let [field (nth (:article-body data) n)]]
+           ^{:key n}
+           [:div.body-field
+            {:class [:mt4]}
+            (case (:compound field)
+              :gallery [gallery field]
+              :paragraph [paragraph field render-quill])]))
        [:pre (with-out-str (cljs.pprint/pprint data))]])))
