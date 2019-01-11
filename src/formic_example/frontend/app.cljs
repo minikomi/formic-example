@@ -1,24 +1,24 @@
 (ns formic-example.frontend.app
-  (:require [reagent.core :as reagent :refer [atom]]
+  (:require [reagent.core :as r]
+            [ajax.core :as ajax]
+            [ajax.formats :as ajax-fmt]
             [cljs-time.coerce :refer [to-long]]
             [cljs-time.core :as t]
             [cljs.pprint :refer [pprint]]
+            [cljs.pprint]
             [formic.components.date-picker :as dp]
-            [formic.components.quill :as quill]
             [formic.components.imagemodal :as formic-imagemodal]
+            [formic.components.quill :as quill]
             [formic.field :as formic-field]
             [formic.frontend :as formic-frontend]
             [formic.util :as u]
             [formic.validation :as fv]
             [goog.dom :as gdom]
-            [ajax.core :as ajax]
-            [ajax.formats :as ajax-fmt]
-            [reagent.core :as r]
             [struct.core :as st]
-            [formic-example.frontend.form-styles :as form-styles]
-            [cljs.pprint]
-            [formic-example.frontend.page-template :as page-template]
+            ;; local
             [formic-example.frontend.color-picker :as color-picker]
+            [formic-example.frontend.form-styles :as form-styles]
+            [formic-example.frontend.page-template :as page-template]
             ))
 
 (defn dev-setup []
@@ -27,24 +27,18 @@
         (println "dev mode"))
     (set! *print-fn* (fn [& _]))))
 
-(def url-regex
-  #"https?://(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)")
-
-(def validate-url
-  {:message "有効なURLを入力してください"
-   :validate (fn [txt]
-               (or
-                (empty? txt)
-                (re-matches url-regex txt)))})
+;; custom validator example
 
 (defn date-active? [d]
   (not
    (t/equal? d (t/today))))
 
 (def validate-date
-  {:message "今日以外の日を選んで下さい"
+  {:message "Choose any date but today."
    :optional true
    :validate date-active?})
+
+;; custom image modal example
 
 (defn list-images-fn [endpoints state]
   (swap! state assoc
@@ -93,6 +87,8 @@
           "&w=300&h=300&fit=clamp"))
    :list-images-fn list-images-fn})
 
+;; Compound fields
+
 (def page-details-field
   {:fields
    [{:id :title-text
@@ -118,43 +114,48 @@
      :type :string
      :validation []}]})
 
-(def quill-required
-  {:message "Required"
-   :optional true
-   :validate (fn [v] (not-empty (:txt v)))})
+(def captioned-image-field
+  {:fields
+   [{:id :image
+     :type :formic-imagemodal
+     :validation [st/required]
+     :options imagemodal-options}
+    {:id :caption
+     :type :string}]})
+
+(def paragraph-field
+  {:fields
+   [{:id :title
+     :title "Title (optional)"
+     :type :string}
+    {:id :body
+     :type :formic-quill
+     :validation [quill/not-blank]}]})
+
+(def gallery-field
+  {:fields
+   [{:id :images
+     :flex [:captioned-image]}]})
 
 (def compound-fields
   {:page page-details-field
-   :captioned-image {:fields
-                     [{:id :image
-                       :type :formic-imagemodal
-                       :validation [st/required]
-                       :options imagemodal-options}
-                      {:id :caption
-                       :type :string}]}
-   :paragraph {:fields
-               [{:id :title
-                 :title "Title (optional)"
-                 :type :string}
-                {:id :body
-                 :type :formic-quill
-                 :validation [quill-required]}]}
-   :gallery {:fields
-             [{:id :images
-               :flex [:captioned-image]}]}})
+   :captioned-image captioned-image-field
+   :paragraph paragraph-field
+   :gallery gallery-field})
 
-(def form-fields
-  [{:id :page-data
-    :compound :page}
-   {:id :article-body
-    :flex [:paragraph :gallery]}])
+;; form schema
 
 (def form-schema
   {:id :test-form
    :components {:color-picker color-picker/component}
    :compound compound-fields
-   :fields form-fields
+   :fields [{:id :page-data
+             :compound :page}
+            {:id :article-body
+             :flex [:paragraph :gallery]}]
    :classes form-styles/combined})
+
+;; pretty print serialized form state
 
 (defn serialized [form-state]
   [:pre#serialized
@@ -162,7 +163,9 @@
      (cljs.pprint/pprint 
       (formic-field/serialize form-state)))])
 
-(def values
+;; some starting data
+
+(def starting-values
 {:page-data
  {:title-text "title text value",
   :hero-image
@@ -272,8 +275,10 @@
      " refers to the model standing with one leg straight, with the majority of the weight on it, and the other leg tucked over and slightly around.\n"}],
    :compound :paragraph}]})
 
+;; render form
+
 (defn form-component [form-schema]
-  (let [form-state (formic-field/prepare-state form-schema values)]
+  (let [form-state (formic-field/prepare-state form-schema starting-values)]
     (fn [form-schema] 
       [:div "Parent component"
        [:form
@@ -288,7 +293,7 @@
                      (cljs.pprint/pprint (formic-field/validate-all form-state)))}]])))
 
 (defn mount []
-  (reagent/render-component
+  (r/render-component
    [form-component form-schema]
    (.getElementById js/document "container")))
 
