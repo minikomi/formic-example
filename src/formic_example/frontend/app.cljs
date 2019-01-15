@@ -115,7 +115,8 @@
      :validation []}]})
 
 (def captioned-image-field
-  {:fields
+  {:options {:collapsable false}
+   :fields
    [{:id :image
      :type :formic-imagemodal
      :validation [st/required]
@@ -148,6 +149,8 @@
 (def form-schema
   {:id :test-form
    :components {:color-picker color-picker/component}
+   :options {:compound {:collapsable true
+                        :default-collapsed true}}
    :compound compound-fields
    :fields [{:id :page-data
              :compound :page}
@@ -283,14 +286,20 @@
       [:div "Parent component"
        [:form
         {:style {:z-index 1}}
-        [formic-frontend/fields form-state]]
+        [formic-frontend/fields form-state]
+        [:button
+         {:on-click (fn [ev]
+                      (.preventDefault ev)
+                      (formic-field/touch-all! form-state)
+                      (when-let [err (formic-field/validate-all form-state)]
+                       (cljs.pprint/pprint err)
+                       (formic-frontend/uncollapse
+                        form-state (get-in err [:node :path]))
+                       (formic-frontend/focus-error)))}
+         "Validate all"]]
        [page-template/page
         (formic-field/serialize form-state)]
-       [:button
-        {:on-click (fn [ev]
-                     (.preventDefault ev)
-                     (formic-field/touch-all! form-state)
-                     (cljs.pprint/pprint (formic-field/validate-all form-state)))}]])))
+       ])))
 
 (defn mount []
   (r/render-component

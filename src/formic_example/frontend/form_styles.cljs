@@ -26,6 +26,7 @@
 (def compound-styles
   {:fieldset    [:ph2 :bn :sans-serif :bg-white]
    :title       [:f6 :db :fw6 :black :pa0 :mv1 :w-100 :fl]
+   :collapse-button [:link :light-silver :dib :ml1 :f7 :hover-dark-gray]
    :fields-list [:list :pt0 :ph0 :pb3 :mv0 :w-100 :fl]
    :fields-item [:pb2]
    :errors-list [:list]
@@ -93,10 +94,10 @@
   {:compound compound-styles
    :flex     flex-styles
    :fields
-   {:string     common-input-styles
-    :number     common-input-styles
-    :select     select-styles
+   {:string common-input-styles
+    :number common-input-styles
+    :select select-styles
     :radios radios-styles
     :formic-imagemodal common-input-styles
-    :formic-datepicker common-input-styles}
+    :formic-quill common-input-styles}
    :buttons buttons-styles})
