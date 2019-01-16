@@ -108,7 +108,8 @@
 
 (defn page [data]
   (let [render-quill
-        (let [el (js/document.createElement "div")]
+        (let [el (js/document.createElement "div")
+              item-count (atom 0)]
           (js/Quill. el))]
     (fn [data]
       [:div.page
@@ -123,7 +124,7 @@
         (doall
          (for [n (range (count (:article-body data)))
                :let [field (nth (:article-body data) n)]]
-           ^{:key field}
+           ^{:key (:id (meta field))}
            [:div.body-field
             {:class [:mt4]}
             (case (:compound field)

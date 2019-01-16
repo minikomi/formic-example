@@ -283,9 +283,6 @@
   {:insert "\n", :attributes {:align "right"}}
   {:insert "This is a demo of the Quilljs Renderer"}
   {:insert "\n", :attributes {:align "left"}}
-  {:insert 1, :attributes {:image "monkey.png", :alt "Funny monkey picture"}}
-  {:insert "\n", :attributes {:align "left"}}
-  {:insert "@jbrumond", :attributes {:atref "jbrumond"}}
   {:insert "\n\n"}
   {:attributes {:italic true, :bold true}, :insert " bold italic "}
   {:attributes {:italic true}, :insert "only italic"}
@@ -329,7 +326,6 @@
                       (.preventDefault ev)
                       (formic-field/touch-all! form-state)
                       (when-let [err (formic-field/validate-all form-state)]
-                       (cljs.pprint/pprint err)
                        (formic-frontend/uncollapse
                         form-state (get-in err [:node :path]))
                        (formic-frontend/focus-error)))}
