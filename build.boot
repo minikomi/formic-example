@@ -20,6 +20,7 @@
                  [weasel                    "0.7.0"      :scope "test"]
                  [funcool/struct "1.3.0"]
                  [cljs-ajax "0.7.5"]
+                 [cljsjs/react-flip-move "3.0.1-1"]
                  ;; forms
                  [co.poyo/formic "0.1.3"]
                  [co.poyo/formic-imagemodal "0.1.0-SNAPSHOT"]

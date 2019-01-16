@@ -1,5 +1,6 @@
 (ns formic-example.frontend.page-template
   (:require [reagent.core :as r]
+            [cljsjs.react-flip-move]
             [reagent.impl.component :refer [extract-props]]))
 
 (defn title-wide [{:keys [page-data]}]
@@ -103,6 +104,8 @@
            :dangerouslySetInnerHTML
            {:__html (.. render-quill -root -innerHTML)}}]])})))
 
+(def flip-move (r/adapt-react-class js/FlipMove))
+
 (defn page [data]
   (let [render-quill
         (let [el (js/document.createElement "div")]
@@ -115,13 +118,15 @@
        (case (get-in data [:page-data :title-type])
          "wide" [title-wide data]
          [title-normal data])
-       (doall
+       [flip-move
+        {:duration 220}
+        (doall
          (for [n (range (count (:article-body data)))
                :let [field (nth (:article-body data) n)]]
-           ^{:key n}
+           ^{:key field}
            [:div.body-field
             {:class [:mt4]}
             (case (:compound field)
               :gallery [gallery field]
-              :paragraph [paragraph field render-quill])]))
+              :paragraph [paragraph field render-quill])]))]
        [:pre (with-out-str (cljs.pprint/pprint data))]])))

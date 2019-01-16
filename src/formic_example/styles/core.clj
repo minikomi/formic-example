@@ -287,6 +287,24 @@
       :width (percent 100)
       :display 'block}]]])
 
+(def page
+  [:.page
+   :.paragraph
+   [:.ql-indent-1
+    {:margin-left (px 20)}]
+   [:.ql-indent-2
+    {:margin-left (px 40)}]
+   [:.ql-indent-3
+    {:margin-left (px 60)}]
+   [:.ql-indent-4
+    {:margin-left (px 80)}]
+   [:.ql-indent-5
+    {:margin-left (px 100)}]
+   [:.ql-indent-6
+    {:margin-left (px 120)}]
+   [:.ql-indent-7
+    {:margin-left (px 140)}]])
+
 (def combined
   [[:*
     {:box-sizing 'border-box
@@ -298,4 +316,5 @@
      {:padding-left (percent 35)}]
     form
     image-modal
-    datepicker]])
+    datepicker
+    page]])

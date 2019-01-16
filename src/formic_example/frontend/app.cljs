@@ -276,7 +276,44 @@
     {:attributes {:italic true}, :insert "model at ease"}
     {:insert
      " refers to the model standing with one leg straight, with the majority of the weight on it, and the other leg tucked over and slightly around.\n"}],
-   :compound :paragraph}]})
+   :compound :paragraph}
+  {:compound :paragraph
+   :body
+[{:insert "Hello, World!\nThis is a second line.", :attributes {:bold true}}
+  {:insert "\n", :attributes {:align "right"}}
+  {:insert "This is a demo of the Quilljs Renderer"}
+  {:insert "\n", :attributes {:align "left"}}
+  {:insert 1, :attributes {:image "monkey.png", :alt "Funny monkey picture"}}
+  {:insert "\n", :attributes {:align "left"}}
+  {:insert "@jbrumond", :attributes {:atref "jbrumond"}}
+  {:insert "\n\n"}
+  {:attributes {:italic true, :bold true}, :insert " bold italic "}
+  {:attributes {:italic true}, :insert "only italic"}
+  {:insert "\n\n"}
+  {:attributes {:italic true}, :insert "new line"}
+  {:insert "\n\nnew line\n\nlist"}
+  {:attributes {:list "bullet"}, :insert "\n"}
+  {:insert "another list"}
+  {:attributes {:list "bullet"}, :insert "\n"}
+  {:insert "indented list  a a"}
+  {:attributes {:indent 1, :list "bullet"}, :insert "\n"}
+  {:insert "further indented list"}
+  {:attributes {:indent 2, :list "bullet"}, :insert "\n"}
+  {:insert "back to level 2 baby"}
+  {:attributes {:indent 1, :list "bullet"}, :insert "\n"}
+  {:insert "oooh yeah"}
+  {:attributes {:indent 1, :list "bullet"}, :insert "\n"}
+  {:insert "top level yo"}
+  {:attributes {:list "bullet"}, :insert "\n"}
+  {:insert "top level list"}
+  {:attributes {:list "bullet"}, :insert "\n"}
+  {:insert "\nthis is some text "}
+  {:attributes {:link "http://google.com"}, :insert "with a link"}
+  {:insert "\n\nend\n\n\n\noooh\n"}]
+
+   }
+
+  ]})
 
 ;; render form
 
