@@ -1,6 +1,7 @@
 (ns formic-example.frontend.page-template
   (:require [reagent.core :as r]
             [cljsjs.react-flip-move]
+            [delta-to-hiccup.core :refer [to-hiccup]]
             [reagent.impl.component :refer [extract-props]]))
 
 (defn title-wide [{:keys [page-data]}]
@@ -45,6 +46,11 @@
     (when (:subtitle-text page-data)
       [:h3 (:subtitle-text page-data)])]])
 
+(defn article-title [data]
+  (case (get-in data [:page-data :title-type])
+    "wide" [title-wide data]
+    [title-normal data]))
+
 (defn gallery [field]
   (let [current-image (r/atom 0)]
     (r/create-class
@@ -87,47 +93,41 @@
                           (str (:image i) "&w=100&h=100&fit=clamp")
                           }]]])))]]))})))
 
-(defn paragraph [field render-quill]
+(defn paragraph [field]
   (let [el (r/atom nil)]
     (r/create-class
      {:reagent-render
-      (fn [field render-quill]
-        (.setContents render-quill
-                      (clj->js (:body field)))
+      (fn [field]
         [:div.paragraph
          (when (:title field)
            [:h3.subheader
             {:class [:f4]}
             (:title field)])
          [:div.paragraph-contents
-          {:class [:pv2 :f5 :w-90 :ma0]
-           :dangerouslySetInnerHTML
-           {:__html (.. render-quill -root -innerHTML)}}]])})))
+          {:class [:pv2 :f5 :w-90 :ma0]}
+            (to-hiccup (js->clj (:body field) :keywordize-keys true))]])})))
 
 (def flip-move (r/adapt-react-class js/FlipMove))
 
+(defn article-body [data]
+  [flip-move
+   {:duration 220}
+   (doall
+    (for [n (range (count (:article-body data)))
+          :let [field (nth (:article-body data) n)]]
+      ^{:key (:id (meta field))}
+      [:div.body-field
+       {:class [:mt4]}
+       (case (:compound field)
+         :gallery [gallery field]
+         :paragraph [paragraph field])]))])
+
 (defn page [data]
-  (let [render-quill
-        (let [el (js/document.createElement "div")
-              item-count (atom 0)]
-          (js/Quill. el))]
-    (fn [data]
-      [:div.page
-       {:style {:margin-left "35%" :width "60%"
-                :z-index 0
-                :position :relative}}
-       (case (get-in data [:page-data :title-type])
-         "wide" [title-wide data]
-         [title-normal data])
-       [flip-move
-        {:duration 220}
-        (doall
-         (for [n (range (count (:article-body data)))
-               :let [field (nth (:article-body data) n)]]
-           ^{:key (:id (meta field))}
-           [:div.body-field
-            {:class [:mt4]}
-            (case (:compound field)
-              :gallery [gallery field]
-              :paragraph [paragraph field render-quill])]))]
-       [:pre (with-out-str (cljs.pprint/pprint data))]])))
+  (fn [data]
+    [:div.page
+     {:style {:margin-left "35%" :width "60%"
+              :z-index 0
+              :position :relative}}
+     [article-title data]
+     [article-body data]
+     [:pre (with-out-str (cljs.pprint/pprint data))]]))

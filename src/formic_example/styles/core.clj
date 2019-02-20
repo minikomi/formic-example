@@ -303,7 +303,9 @@
    [:.ql-indent-6
     {:margin-left (px 120)}]
    [:.ql-indent-7
-    {:margin-left (px 140)}]])
+    {:margin-left (px 140)}]
+   [:li.nested
+    {:list-style 'none}]])
 
 (def combined
   [[:*
@@ -312,8 +314,11 @@
    [:body
     {:font-family ['YuGothic 'sans-serif]
      :font-size (px 14)}
-    [:#serialized
-     {:padding-left (percent 35)}]
+    [:pre
+     {:padding (percent 10)
+      :background "#444"
+      :overflow 'scroll
+      :color "#f2f2f2"}]
     form
     image-modal
     datepicker
