@@ -1,0 +1,45 @@
+{:paths   ["resources" "src" "target" "config/prod"]
+ :deps    {org.clojure/clojure       {:mvn/version "RELEASE"}
+           yogthos/config            {:mvn/version "1.1.2"}
+           mount                     {:mvn/version "0.1.16"}
+           me.raynes/fs              {:mvn/version "1.4.6"}
+           com.taoensso/timbre       {:mvn/version "4.10.0"}
+           ;; html
+           hiccup                    {:mvn/version "1.0.5"}
+           ;; css
+           garden                    {:mvn/version "1.3.9"}
+           ;; cljs
+           reagent                   {:mvn/version "0.8.1"}
+           co.poyo/watch-and-run     {:local/root "/Users/adammoore/src/watch-and-run"}
+           co.poyo/formic            {:local/root "/Users/adammoore/src/formic"}
+           co.poyo/formic-imagemodal {:local/root "/Users/adammoore/src/formic-imagemodal"}
+           co.poyo/formic-datepicker {:local/root "/Users/adammoore/src/formic-datepicker"}
+           co.poyo/formic-quill      {:local/root "/Users/adammoore/src/formic-quill"}
+           co.poyo/delta-to-hiccup   {:local/root "/Users/adammoore/src/delta-to-hiccup"}
+           cljsjs/react              {:mvn/version "16.6.0-0"}
+           cljsjs/react-color        {:mvn/version "2.13.8-0"}
+           cljs-ajax                 {:mvn/version "0.7.5"}
+           cljsjs/react-flip-move    {:mvn/version "3.0.1-1"}
+           ;; figwheel
+           com.bhauman/figwheel-main {:mvn/version "0.2.1-SNAPSHOT"}
+           }
+ :aliases {:server {:extra-paths ["config/dev"]
+                    :extra-deps  {ring                       {:mvn/version "1.7.1"
+                                                              :exclusions  [org.eclipse.jetty.websocket/websocket-server
+                                                                            org.eclipse.jetty.websocket/websocket-servlet]}
+                                  ring-middleware-format     {:mvn/version "0.7.4"}
+                                  ring/ring-defaults         {:mvn/version "0.3.2"}
+                                  metosin/ring-http-response {:mvn/version "0.9.1"}
+                                  http-kit                   {:mvn/version "2.3.0"}}}
+           :cider  {:extra-deps {org.clojure/clojure {:mvn/version "RELEASE"}
+                                 cider/cider-nrepl   {:mvn/version "0.22.0-beta4"}
+                                 cider/piggieback    {:mvn/version "0.4.1"}
+                                 refactor-nrepl      {:mvn/version "2.5.0-SNAPSHOT"}}}
+           :test   {:extra-paths ["test"]
+                    :extra-deps  {org.clojure/test.check {:mvn/version "RELEASE"}}}
+           :runner
+           {:extra-deps {com.cognitect/test-runner
+                         {:git/url "https://github.com/cognitect-labs/test-runner"
+                          :sha     "76568540e7f40268ad2b646110f237a60295fa3c"}}
+            :main-opts  ["-m" "cognitect.test-runner"
+                         "-d" "test"]}}}

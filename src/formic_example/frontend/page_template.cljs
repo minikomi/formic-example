@@ -123,11 +123,19 @@
          :paragraph [paragraph field])]))])
 
 (defn page [data]
-  (fn [data]
-    [:div.page
-     {:style {:margin-left "35%" :width "60%"
-              :z-index 0
-              :position :relative}}
-     [article-title data]
-     [article-body data]
-     [:pre (with-out-str (cljs.pprint/pprint data))]]))
+  (let [data-show (r/atom false)]
+   (fn [data]
+     [:div.page
+      {:style {:margin-left "35%" :width "60%"
+               :z-index 0
+               :position :relative}}
+      [article-title data]
+      [article-body data]
+      [:div.data
+       [:h5
+        [:a {:on-click (fn [ev]
+                         (.preventDefault ev)
+                         (swap! data-show not))}
+         "Data"]]
+       (when @data-show
+         [:pre (with-out-str (cljs.pprint/pprint data))])]])))
